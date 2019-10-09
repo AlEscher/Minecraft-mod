@@ -76,19 +76,19 @@ public class MazeTest {
 		for (int i = 0; i < lenght; i++) {
 			if (Math.random() < 0.4) {
 				if (Math.random() < 0.5 && validateCoor(current_x + 1, current_y)) {
-					//System.out.println("x + 1");
+					// System.out.println("x + 1");
 					current_x++;
 
 				} else if (validateCoor(current_x - 1, current_y)) {
-					//System.out.println("x - 1");
+					// System.out.println("x - 1");
 					current_x--;
 				}
 			} else {
 				if (Math.random() < 0.6 && validateCoor(current_x, current_y + 1)) {
-					//System.out.println("y + 1");
+					// System.out.println("y + 1");
 					current_y++;
 				} else if (validateCoor(current_x, current_y - 1)) {
-					//System.out.println("y - 1");
+					// System.out.println("y - 1");
 					current_y--;
 				}
 			}
@@ -114,26 +114,45 @@ public class MazeTest {
 	private Coordinate nextMain(Coordinate c) {
 		int x = c.getX();
 		int y = c.getY();
-		Coordinate result;
-		if (matrix[y + 1][x] == 1||matrix[y + 1][x] == 3 ) {
-
+		Coordinate result = null;
+		if (matrix[y + 1][x] == 1 || matrix[y + 1][x] == 3) {
+			result = new Coordinate(x, y + 1);
 		}
-		if (matrix[y - 1][x] == 1||matrix[y + 1][x] == 3) {
-
+		if (matrix[y - 1][x] == 1 || matrix[y - 1][x] == 3) {
+			result = new Coordinate(x, y - 1);
 		}
-		if (matrix[y][x+1] == 1||matrix[y][x+1] == 3) {
-
+		if (matrix[y][x + 1] == 1 || matrix[y][x + 1] == 3) {
+			result = new Coordinate(x + 1, y);
 		}
-		if (matrix[y][x-1] == 1||matrix[y][x-1] == 3) {
-
+		if (matrix[y][x - 1] == 1 || matrix[y][x - 1] == 3) {
+			result = new Coordinate(x - 1, y);
 		}
-		result = new Coordinate(x, y);
 		return result;
 	}
 
-	public void generateSidePath() {
+	public void generateSidePaths() {
 		int begin = (int) (Math.random() * 6) + 1;
+		Coordinate recent = startcoor;
+		Coordinate nextPath;
+		for (; begin > 0; begin--) {
+			recent = nextMain(recent);
+			matrix[recent.getY()][recent.getX()] = 5;
+		}
+		if (Math.random() < 0.5) {
+			if (Math.random() < 0.5 && matrix[recent.getY() + 1][recent.getX()] == 0) {
+				nextPath = new Coordinate(recent.getY() + 1, recent.getX());
+			} else {
+				nextPath = new Coordinate(recent.getY(), recent.getX() + 1);
 
+			}
+		} else {
+			if (Math.random() < 0.5 && matrix[recent.getY() - 1][recent.getX()] == 0) {
+				nextPath = new Coordinate(recent.getY() - 1, recent.getX());
+			} else {
+				nextPath = new Coordinate(recent.getY(), recent.getX() - 1);
+
+			}
+		}
 	}
 
 //	public static void main(String[] args) {
