@@ -1,6 +1,7 @@
 package me.mape.mazescape.init;
 
 import me.mape.mazescape.item.MapeItem;
+import me.mape.mazescape.item.MazeGenerator;
 import me.mape.mazescape.item.MazeScapeKey;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
@@ -15,22 +16,25 @@ import me.mape.mazescape.reference.Reference;
 public class ModItems {
 	
 	public static MapeItem mazekey;
+	public static MapeItem mazegen;
 	
 	public static void init() {
 		
 		mazekey = new MazeScapeKey();
+		mazegen = new MazeGenerator();
 		//ForgeRegistries.ITEMS.register(mazekey);
 		
 	}
 	
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<Item> event) {
-		event.getRegistry().registerAll(mazekey);
+		event.getRegistry().registerAll(mazekey, mazegen);
 	}
 	
 	@SubscribeEvent
 	public static void registerRenders(ModelRegistryEvent event) {
 		registerRender(mazekey);
+		registerRender(mazegen);
 	}
 	
 	private static void registerRender(Item item) {

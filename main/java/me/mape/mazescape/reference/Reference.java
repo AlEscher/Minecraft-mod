@@ -22,9 +22,21 @@ public class Reference {
 			return registryName;
 		}
 		
-//		public String getUnlocalizedName() {
-//			return unlocalizedName;
-//		}
+	}
+	
+	public static enum MazeGenEnum {
+		MAZEGEN("mazegen");
+		
+		private String unlocalizedName;
+		private String registryName;
+		
+		MazeGenEnum(String registryName) {
+			this.registryName = registryName;
+		}
+		
+		public String getRegistryName() {
+			return registryName;
+		}
 	}
 	
 }
