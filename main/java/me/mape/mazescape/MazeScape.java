@@ -11,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 
 import me.mape.mazescape.proxy.IProxy;
 import me.mape.mazescape.reference.Reference;
+import me.mape.mazescape.utility.LogHelper;
 
 @Mod(modid = MazeScape.MODID, name = MazeScape.NAME, version = MazeScape.VERSION)
 public class MazeScape
@@ -22,17 +23,18 @@ public class MazeScape
     @Instance(Reference.MOD_ID)
     public static MazeScape instance;
     
-    @SidedProxy(clientSide = "me.mape.mazescape.proxy.ClientProxy", serverSide = "me.mape.mazescape.proxy.ServerProxy")
+    @SidedProxy(clientSide = Reference.CLIENT_PROXY_CLASS, serverSide = Reference.SERVER_PROXY_CLASS)
     public static IProxy proxy;
     
     @EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
+    	LogHelper.info("PreInit complete");
     }
 
     @EventHandler
     public void init(FMLInitializationEvent event)
     {
-        // some example code
+        LogHelper.info("Init complete");
     }
 }
