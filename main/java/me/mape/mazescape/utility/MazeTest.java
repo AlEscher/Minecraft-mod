@@ -30,11 +30,16 @@ public class MazeTest {
 	}
 
 	
-	public MazeTest(int x, int y) {
+	public MazeTest(int x, int y, int length, int minLength) {
 		this.max_y = y;
 		this.max_x = x;
 
 		this.matrix = new int[y][x];
+		generateMainPath(length, minLength);
+	}
+	
+	public int[][] getMatrix() {
+		return matrix;
 	}
 
 	private boolean validateCoor(int x, int y) {
@@ -64,7 +69,7 @@ public class MazeTest {
 		}
 	}
 
-	private void generateMainPath(int lenght) {
+	private void generateMainPath(int lenght, int minLength) {
 		int steps=0;
 		int start = (int) (Math.random() * (max_x - 2));
 		int current_x = 1 + start;
@@ -102,9 +107,9 @@ public class MazeTest {
 			//current.print();
 		}
 		matrix[current.getY()][current.getX()]=3;
-		if(steps<50) {
+		if(steps<minLength) {
 			matrix=new int [max_y][max_x];
-			generateMainPath(lenght);
+			generateMainPath(lenght, minLength);
 		}
 	}
 
@@ -113,11 +118,11 @@ public class MazeTest {
 		
 	}
 	
-	public static void main(String[] args) {
-		MazeTest m1 = new MazeTest(30, 30);
-		// m1.printmatrix();
-		m1.generateMainPath(300);
-		System.out.println("---------------------------------------------------");
-		m1.printmatrix();
-	}
+//	public static void main(String[] args) {
+//		MazeTest m1 = new MazeTest(30, 30);
+//		// m1.printmatrix();
+//		m1.generateMainPath(300);
+//		System.out.println("---------------------------------------------------");
+//		m1.printmatrix();
+//	}
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import me.mape.mazescape.reference.Reference;
+import me.mape.mazescape.utility.MazeTest;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
@@ -26,6 +27,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class MazeScapeKey extends MapeItem{
 	
 	private EntityPlayer currentPlayer;
+	private MazeTest mazeGenerator;
 	
 	public MazeScapeKey() {
 		super();
@@ -58,7 +60,19 @@ public class MazeScapeKey extends MapeItem{
 			showMessage("Clicked on: " + selectedBlock.getBlock().getLocalizedName());
 		}
 		
+		if (mazeGenerator == null) {
+			mazeGenerator = new MazeTest(10, 10, 80, 40);
+		}
+		
+		if (mazeGenerator != null) {
+			
+		}
+		
 		return EnumActionResult.PASS;
     }
+	
+	private void buildLabyrinth(int[][] bluePrint) {
+		
+	}
 
 }
