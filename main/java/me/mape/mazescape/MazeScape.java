@@ -9,6 +9,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import org.apache.logging.log4j.Logger;
 
+import me.mape.mazescape.init.ModItems;
 import me.mape.mazescape.proxy.IProxy;
 import me.mape.mazescape.reference.Reference;
 import me.mape.mazescape.utility.LogHelper;
@@ -29,6 +30,7 @@ public class MazeScape
     @EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
+    	ModItems.init();
     	LogHelper.info("PreInit complete");
     }
 
