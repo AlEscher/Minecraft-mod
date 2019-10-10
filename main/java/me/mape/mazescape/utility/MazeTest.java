@@ -34,23 +34,32 @@ public class MazeTest {
 	public MazeTest(int x, int y, int length, int minLength) {
 		this.max_y = y;
 		this.max_x = x;
-		this.minMainLength=minLength;
-		this.mainPlength=length;
+		this.minMainLength = minLength;
+		this.mainPlength = length;
 		this.matrix = new int[y][x];
-		
+
 	}
 
 	public int[][] getMatrix() {
 		return matrix;
 	}
-	
-	public void setMatrix(int [][]matrix) {
-		this.matrix=matrix;
+
+	public void emptyMatrix() {
+		this.matrix = new int[max_y][max_x];
 	}
 	
+	public boolean matrixIsEmpty() {
+		for(int i=0;i<matrix.length;i++)
+			for(int k=0;k<matrix[i].length;k++)
+				if(matrix[i][k]!=0) {
+					return false;
+				}
+		return true;
+	}
+
 	public void generateMaze() {
-		generateMainPath(this.mainPlength,this.minMainLength);
-		
+		generateMainPath(this.mainPlength, this.minMainLength);
+
 	}
 
 	private boolean validateCoor(int x, int y) {
@@ -140,20 +149,21 @@ public class MazeTest {
 		}
 		return result;
 	}
+
 	private Coordinate lastMain(Coordinate c) {
 		int x = c.getX();
 		int y = c.getY();
 		Coordinate result = null;
-		if (matrix[y + 1][x] == 5) {
+		if (matrix[y + 1][x] == 5||matrix[y + 1][x] == 4) {
 			result = new Coordinate(x, y + 1);
 		}
-		if (matrix[y - 1][x] == 5) {
+		if (matrix[y - 1][x] == 5||matrix[y - 1][x] == 4) {
 			result = new Coordinate(x, y - 1);
 		}
-		if (matrix[y][x + 1] == 5) {
+		if (matrix[y][x + 1] == 5||matrix[y][x+1] == 4) {
 			result = new Coordinate(x + 1, y);
 		}
-		if (matrix[y][x - 1] == 5) {
+		if (matrix[y][x - 1] == 5||matrix[y][x-1] == 4) {
 			result = new Coordinate(x - 1, y);
 		}
 		return result;
@@ -161,11 +171,12 @@ public class MazeTest {
 
 	public void generateSidePaths() {
 		int begin = (int) (Math.random() * 6) + 1;
+		System.out.println(begin);
 		Coordinate recent = startcoor;
 		Coordinate nextPath1 = null;
 		Coordinate nextPath2 = null;
 		for (; begin > 0; begin--) {
-			recent = nextMain(recent);
+			recent=nextMain(recent);
 			matrix[recent.getY()][recent.getX()] = 5;
 		}
 		if (matrix[recent.getY() + 1][recent.getX()] == 0)
@@ -189,17 +200,17 @@ public class MazeTest {
 			System.out.println("Trying generatin sidePath at: ");
 			nextPath1.print();
 			generateSidePath(nextPath1);
-			
+
 		} else {
 			System.out.println("Trying generatin sidePath at: ");
 			nextPath1.print();
 			generateSidePath(nextPath2);
 		}
 	}
-	
-	public boolean validateCoorS(int x,int y) {
-		if (x < max_x - 1 && y < max_y - 1 && x > 0 && y > 0 && (matrix[y][x] == 0||matrix[y][x]==2)) {
-			if (nextMain(new Coordinate(x,y))!=null||lastMain(new Coordinate(x,y))!=null)
+
+	public boolean validateCoorS(int x, int y) {
+		if (x < max_x - 1 && y < max_y - 1 && x > 0 && y > 0 && (matrix[y][x] == 0 || matrix[y][x] == 2)) {
+			if (nextMain(new Coordinate(x, y)) != null || lastMain(new Coordinate(x, y)) != null)
 				return false;
 			else
 				return true;
@@ -208,13 +219,13 @@ public class MazeTest {
 	}
 
 	public void generateSidePath(Coordinate c) {
-		Coordinate current =c;
-		Coordinate last=null;
-		int current_x=c.getX();
-		int current_y=c.getY();
-		int lenght=max_x*2;
-		int steps=0;		
-		
+		Coordinate current = c;
+		Coordinate last = null;
+		int current_x = c.getX();
+		int current_y = c.getY();
+		int lenght = max_x * 2;
+		int steps = 0;
+
 		for (int i = 0; i < lenght; i++) {
 			if (Math.random() < 0.4) {
 				if (Math.random() < 0.5 && validateCoorS(current_x + 1, current_y)) {
@@ -239,17 +250,18 @@ public class MazeTest {
 				matrix[current.getY()][current.getX()] = 2;
 				steps++;
 				current = new Coordinate(current_x, current_y);
-				if(matrix[current.getY()][current.getX()]==2) {
+				if (matrix[current.getY()][current.getX()] == 2) {
 					System.out.println("Hit another sidepath");
 					return;
 				}
 
 			}
 		}
-	} 
+	}
 
 	public static void main(String[] args) {
-		MazeTest m1 = new MazeTest(30, 30,300,20);
+		MazeTest m1 = new MazeTest(30, 30, 300, 20);
+		m1.generateMaze();
 		// m1.printmatrix();
 		System.out.println("---------------------------------------------------");
 		m1.printmatrix();
