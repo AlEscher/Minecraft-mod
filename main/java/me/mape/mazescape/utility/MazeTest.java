@@ -6,6 +6,8 @@ public class MazeTest {
 	private int max_y;
 	private Coordinate startcoor;
 	private int matrix[][];
+	private int mainPlength;
+	private int minMainLength;
 
 	private class Coordinate {
 		private int x;
@@ -32,13 +34,23 @@ public class MazeTest {
 	public MazeTest(int x, int y, int length, int minLength) {
 		this.max_y = y;
 		this.max_x = x;
-
+		this.minMainLength=minLength;
+		this.mainPlength=length;
 		this.matrix = new int[y][x];
-		generateMainPath(length, minLength);
+		
 	}
 
 	public int[][] getMatrix() {
 		return matrix;
+	}
+	
+	public void setMatrix(int [][]matrix) {
+		this.matrix=matrix;
+	}
+	
+	public void generateMaze() {
+		generateMainPath(this.mainPlength,this.minMainLength);
+		
 	}
 
 	private boolean validateCoor(int x, int y) {
@@ -174,8 +186,13 @@ public class MazeTest {
 			nextPath2 = new Coordinate(recent.getX() - 1, recent.getY() - 1);
 		}
 		if (Math.random() < 0.5) {
+			System.out.println("Trying generatin sidePath at: ");
+			nextPath1.print();
 			generateSidePath(nextPath1);
+			
 		} else {
+			System.out.println("Trying generatin sidePath at: ");
+			nextPath1.print();
 			generateSidePath(nextPath2);
 		}
 	}
@@ -195,7 +212,7 @@ public class MazeTest {
 		Coordinate last=null;
 		int current_x=c.getX();
 		int current_y=c.getY();
-		int lenght=max_x;
+		int lenght=max_x*2;
 		int steps=0;		
 		
 		for (int i = 0; i < lenght; i++) {
@@ -222,12 +239,14 @@ public class MazeTest {
 				matrix[current.getY()][current.getX()] = 2;
 				steps++;
 				current = new Coordinate(current_x, current_y);
-				if(matrix[current.getY()][current.getX()]==2)
+				if(matrix[current.getY()][current.getX()]==2) {
+					System.out.println("Hit another sidepath");
 					return;
+				}
 
 			}
 		}
-	}
+	} 
 
 	public static void main(String[] args) {
 		MazeTest m1 = new MazeTest(30, 30,300,20);
