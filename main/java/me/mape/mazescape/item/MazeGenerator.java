@@ -5,6 +5,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import me.mape.mazescape.reference.Reference;
+import me.mape.mazescape.utility.LogHelper;
 import me.mape.mazescape.utility.MazeTest;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.util.ITooltipFlag;
@@ -44,7 +45,7 @@ public class MazeGenerator extends MapeItem{
 	 * @param message
 	 */
 	private void showMessage(String message) {
-		//currentPlayer.sendMessage(new TextComponentString(message));
+		currentPlayer.sendMessage(new TextComponentString(message));
 	}
 	
 	@Override
@@ -55,11 +56,15 @@ public class MazeGenerator extends MapeItem{
     {
 		currentPlayer = player;
 		if (mazeGenerator == null) {
+			LogHelper.info("Generating maze matrix...");
 			mazeGenerator = new MazeTest(10, 10, 80, 20);
+			LogHelper.info("Matrix generated");
 		}
 		
 		if (mazeGenerator != null) {
+			LogHelper.info("Building maze...");
 			buildLabyrinth(mazeGenerator.getMatrix(), worldIn, pos);
+			LogHelper.info("Maze built");
 		}
 		
 		return EnumActionResult.PASS;
@@ -90,6 +95,13 @@ public class MazeGenerator extends MapeItem{
 					
 				}
 			}
+			double progress = (double)i / (double)bluePrint.length;
+			if (worldIn.isRemote && i > 0) {
+				showMessage("Loaded " + progress * 100 + "% of maze!");
+			}
+		}
+		if (worldIn.isRemote) {
+			showMessage("Loaded 100% of maze!");
 		}
 	}
 
