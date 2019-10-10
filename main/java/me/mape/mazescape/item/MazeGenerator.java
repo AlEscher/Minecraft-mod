@@ -32,6 +32,13 @@ public class MazeGenerator extends MapeItem{
 	private double[] currentStartPoint;
 	private double[] mazeSpawnPoint;
 	
+	// values for the maze
+	private int x = 20;
+	private int y = 20;
+	private int length = 160;
+	private int minLength = 50;
+	private boolean hasChanged = false;
+	
 	public MazeGenerator() {
 		super();
 		this.setCreativeTab(CreativeTabs.TOOLS);
@@ -43,6 +50,14 @@ public class MazeGenerator extends MapeItem{
 	@SideOnly(Side.CLIENT)
 	public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 		tooltip.add("Use this item to build a stage");
+	}
+	
+	public void updateMazeValues(int x, int y, int length, int minLength) {
+		this.x = x;
+		this.y = y;
+		this.length = length;
+		this.minLength = minLength;
+		this.hasChanged = true;
 	}
 	
 	/**
@@ -62,9 +77,13 @@ public class MazeGenerator extends MapeItem{
     {
 		currentPlayer = player;
 		currentWorld = worldIn;
+		
+		if (!hasChanged && worldIn.isRemote)
+			showMessage("Using default values, type /setupmaze to customize the maze");
+		
 		LogHelper.info("Generating maze matrix...");
 		if (mazeGenerator == null)
-			mazeGenerator = new MazeTest(10, 10, 80, 20);
+			mazeGenerator = new MazeTest(x, y, length, minLength);
 		if (mazeGenerator.matrixIsEmpty()) {
 			mazeGenerator.generateMaze();
 			double[] spawnPoint = {pos.getX(), pos.getY(), pos.getZ()};
