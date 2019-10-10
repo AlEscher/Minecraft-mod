@@ -6,6 +6,7 @@ import javax.annotation.Nullable;
 
 import me.mape.mazescape.reference.Reference;
 import me.mape.mazescape.utility.MazeTest;
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
@@ -47,7 +48,8 @@ public class MazeScapeKey extends MapeItem{
 	 * @param message
 	 */
 	private void showMessage(String message) {
-		currentPlayer.sendMessage(new TextComponentString(message));
+		if (currentPlayer != null)
+			currentPlayer.sendMessage(new TextComponentString(message));
 	}
 	
 	@Override
@@ -57,9 +59,11 @@ public class MazeScapeKey extends MapeItem{
     public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
     {
 		currentPlayer = player;
-		IBlockState selectedBlock = worldIn.getBlockState(pos);
-		if (currentPlayer != null && worldIn.isRemote) {
-			showMessage("Clicked on: " + selectedBlock.getBlock().getLocalizedName());
+		Block selectedBlock = worldIn.getBlockState(pos).getBlock();
+		if (Block.getStateId(selectedBlock.getDefaultState()) == Block.getStateId(Blocks.DIAMOND_BLOCK.getDefaultState())) {
+			if (worldIn.isRemote) {
+				showMessage("Congratulations, you solved the maze!");
+			}
 		}
 		
 		return EnumActionResult.PASS;

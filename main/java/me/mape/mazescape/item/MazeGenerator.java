@@ -45,7 +45,8 @@ public class MazeGenerator extends MapeItem{
 	 * @param message
 	 */
 	private void showMessage(String message) {
-		currentPlayer.sendMessage(new TextComponentString(message));
+		if (currentPlayer != null)
+			currentPlayer.sendMessage(new TextComponentString(message));
 	}
 	
 	@Override
