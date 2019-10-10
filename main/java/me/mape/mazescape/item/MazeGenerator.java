@@ -13,12 +13,14 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -26,6 +28,7 @@ public class MazeGenerator extends MapeItem{
 	
 	private MazeTest mazeGenerator;
 	private EntityPlayer currentPlayer;
+	private double[] currentStartPoint;
 	
 	public MazeGenerator() {
 		super();
@@ -56,16 +59,25 @@ public class MazeGenerator extends MapeItem{
     public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
     {
 		currentPlayer = player;
-		if (mazeGenerator == null) {
-			LogHelper.info("Generating maze matrix...");
-			mazeGenerator = new MazeTest(10, 10, 80, 20);
-			LogHelper.info("Matrix generated");
-		}
+		LogHelper.info("Generating maze matrix...");
+		mazeGenerator = new MazeTest(10, 10, 80, 20);
+		LogHelper.info("Matrix generated");
 		
 		if (mazeGenerator != null) {
 			LogHelper.info("Building maze...");
 			buildLabyrinth(mazeGenerator.getMatrix(), worldIn, pos);
 			LogHelper.info("Maze built");
+			if (currentStartPoint != null) {
+				
+				LogHelper.info("Teleporting player to start point...");
+				double px = currentStartPoint[0] + 0.5;
+				double py = currentStartPoint[1] + 1;
+				double pz = currentStartPoint[2] + 0.5;
+			
+				MinecraftServer s = FMLCommonHandler.instance().getMinecraftServerInstance();
+				s.getCommandManager().executeCommand( s, "/tp " + player.getName() + " " + px + " " + py + " " + pz );
+				LogHelper.info("Player teleported");
+			}
 		}
 		
 		return EnumActionResult.PASS;
@@ -85,10 +97,13 @@ public class MazeGenerator extends MapeItem{
 					break;
 				case 1:
 					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY(), pos.getZ() + i), Blocks.GLOWSTONE.getDefaultState());
-					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY() + 4, pos.getZ() + i), Blocks.BEDROCK.getDefaultState());
+					//worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY() + 4, pos.getZ() + i), Blocks.BEDROCK.getDefaultState());
 					break;
 				case 4:
 					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY() + 1, pos.getZ() + i), Blocks.CARPET.getDefaultState());
+					double[] startPoint = {pos.getX() + j, pos.getY(), pos.getZ() + i};
+					LogHelper.info("Found start point at: " + startPoint[0] + " " + startPoint[1] + " " + startPoint[2]);
+					currentStartPoint = startPoint;
 					break;
 				case 3:
 					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY(), pos.getZ() + i), Blocks.DIAMOND_BLOCK.getDefaultState());

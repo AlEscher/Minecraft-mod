@@ -29,6 +29,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class MazeScapeKey extends MapeItem{
 	
 	private EntityPlayer currentPlayer;
+	private int currentStage = 0;
 	
 	public MazeScapeKey() {
 		super();
@@ -62,7 +63,7 @@ public class MazeScapeKey extends MapeItem{
 		Block selectedBlock = worldIn.getBlockState(pos).getBlock();
 		if (Block.getStateId(selectedBlock.getDefaultState()) == Block.getStateId(Blocks.DIAMOND_BLOCK.getDefaultState())) {
 			if (worldIn.isRemote) {
-				showMessage("Congratulations, you solved the maze!");
+				showMessage("Congratulations, you solved the maze!\nProgressing to stage " + ++currentStage);
 			}
 		}
 		
