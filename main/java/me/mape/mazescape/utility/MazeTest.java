@@ -8,6 +8,7 @@ public class MazeTest {
 	private int matrix[][];
 	private int mainPlength;
 	private int minMainLength;
+	private int mainSteps;
 
 	private class Coordinate {
 		private int x;
@@ -29,6 +30,12 @@ public class MazeTest {
 		public void print() {
 			System.out.println("(" + x + "," + y + ")");
 		}
+
+		public boolean equals(Coordinate c) {
+			if (c.x == this.x && c.y == this.y)
+				return true;
+			return false;
+		}
 	}
 
 	public MazeTest(int x, int y, int length, int minLength) {
@@ -47,11 +54,11 @@ public class MazeTest {
 	public void emptyMatrix() {
 		this.matrix = new int[max_y][max_x];
 	}
-	
+
 	public boolean matrixIsEmpty() {
-		for(int i=0;i<matrix.length;i++)
-			for(int k=0;k<matrix[i].length;k++)
-				if(matrix[i][k]!=0) {
+		for (int i = 0; i < matrix.length; i++)
+			for (int k = 0; k < matrix[i].length; k++)
+				if (matrix[i][k] != 0) {
 					return false;
 				}
 		return true;
@@ -59,6 +66,7 @@ public class MazeTest {
 
 	public void generateMaze() {
 		generateMainPath(this.mainPlength, this.minMainLength);
+		generateSidePaths();
 
 	}
 
@@ -96,19 +104,15 @@ public class MazeTest {
 		for (int i = 0; i < lenght; i++) {
 			if (Math.random() < 0.4) {
 				if (Math.random() < 0.5 && validateCoor(current_x + 1, current_y)) {
-					// System.out.println("x + 1");
 					current_x++;
 
 				} else if (validateCoor(current_x - 1, current_y)) {
-					// System.out.println("x - 1");
 					current_x--;
 				}
 			} else {
 				if (Math.random() < 0.6 && validateCoor(current_x, current_y + 1)) {
-					// System.out.println("y + 1");
 					current_y++;
 				} else if (validateCoor(current_x, current_y - 1)) {
-					// System.out.println("y - 1");
 					current_y--;
 				}
 			}
@@ -122,13 +126,13 @@ public class MazeTest {
 				current = new Coordinate(current_x, current_y);
 
 			}
-			// current.print();
 		}
 		matrix[current.getY()][current.getX()] = 3;
 		if (steps < minLength) {
 			matrix = new int[max_y][max_x];
 			generateMainPath(lenght, minLength);
 		}
+		mainSteps = steps;
 	}
 
 	private Coordinate nextMain(Coordinate c) {
@@ -154,57 +158,83 @@ public class MazeTest {
 		int x = c.getX();
 		int y = c.getY();
 		Coordinate result = null;
-		if (matrix[y + 1][x] == 5||matrix[y + 1][x] == 4) {
+		if (matrix[y + 1][x] == 5 || matrix[y + 1][x] == 4) {
 			result = new Coordinate(x, y + 1);
 		}
-		if (matrix[y - 1][x] == 5||matrix[y - 1][x] == 4) {
+		if (matrix[y - 1][x] == 5 || matrix[y - 1][x] == 4) {
 			result = new Coordinate(x, y - 1);
 		}
-		if (matrix[y][x + 1] == 5||matrix[y][x+1] == 4) {
+		if (matrix[y][x + 1] == 5 || matrix[y][x + 1] == 4) {
 			result = new Coordinate(x + 1, y);
 		}
-		if (matrix[y][x - 1] == 5||matrix[y][x-1] == 4) {
+		if (matrix[y][x - 1] == 5 || matrix[y][x - 1] == 4) {
 			result = new Coordinate(x - 1, y);
 		}
 		return result;
 	}
 
 	public void generateSidePaths() {
-		int begin = (int) (Math.random() * 6) + 1;
-		System.out.println(begin);
+		int wayDone = 0;
 		Coordinate recent = startcoor;
-		Coordinate nextPath1 = null;
-		Coordinate nextPath2 = null;
-		for (; begin > 0; begin--) {
-			recent=nextMain(recent);
-			matrix[recent.getY()][recent.getX()] = 5;
-		}
-		if (matrix[recent.getY() + 1][recent.getX()] == 0)
-			nextPath1 = new Coordinate(recent.getX(), recent.getY() + 1);
-		if (matrix[recent.getY() - 1][recent.getX()] == 0) {
-			if (nextPath1 == null)
-				nextPath1 = new Coordinate(recent.getX(), recent.getY() - 1);
-			nextPath2 = new Coordinate(recent.getX(), recent.getY() - 1);
-		}
-		if (matrix[recent.getY()][recent.getX() + 1] == 0) {
-			if (nextPath1 == null)
-				nextPath1 = new Coordinate(recent.getX() + 1, recent.getY() - 1);
-			nextPath2 = new Coordinate(recent.getX() + 1, recent.getY() - 1);
-		}
-		if (matrix[recent.getY()][recent.getX() - 1] == 0) {
-			if (nextPath1 == null)
-				nextPath1 = new Coordinate(recent.getX() - 1, recent.getY() - 1);
-			nextPath2 = new Coordinate(recent.getX() - 1, recent.getY() - 1);
-		}
-		if (Math.random() < 0.5) {
-			System.out.println("Trying generatin sidePath at: ");
+		while (true) {
+			int begin = (int) (Math.random() * 6) + 1;
+			Coordinate nextPath1 = null;
+			Coordinate nextPath2 = null;
+			wayDone = wayDone + begin;
+			if (wayDone >= mainSteps) {
+				for (int i = 0; i < matrix.length; i++)
+					for (int k = 0; k < matrix[i].length; k++)
+						if (matrix[i][k] == 5) {
+							matrix[i][k] = 1;
+						}
+				return;
+			}
+			for (; begin > 0; begin--) {
+				recent = nextMain(recent);
+				matrix[recent.getY()][recent.getX()] = 5;
+			}
+			if (matrix[recent.getY() + 1][recent.getX()] == 0)
+				nextPath1 = new Coordinate(recent.getX(), recent.getY() + 1);
+			if (matrix[recent.getY() - 1][recent.getX()] == 0) {
+				if (nextPath1 == null)
+					nextPath1 = new Coordinate(recent.getX(), recent.getY() - 1);
+				nextPath2 = new Coordinate(recent.getX(), recent.getY() - 1);
+			}
+			if (matrix[recent.getY()][recent.getX() + 1] == 0) {
+				if (nextPath1 == null)
+					nextPath1 = new Coordinate(recent.getX() + 1, recent.getY());
+				nextPath2 = new Coordinate(recent.getX() + 1, recent.getY());
+			}
+			if (matrix[recent.getY()][recent.getX() - 1] == 0) {
+				if (nextPath1 == null)
+					nextPath1 = new Coordinate(recent.getX() - 1, recent.getY());
+				nextPath2 = new Coordinate(recent.getX() - 1, recent.getY());
+			}
+			System.out.println("Possible SidePaths:");
 			nextPath1.print();
-			generateSidePath(nextPath1);
+			if (nextPath2 == null) {
+				System.out.println("Trying generatin sidePath at: ");
+				nextPath1.print();
+				generateSidePath(nextPath1);
+			} else {
+				nextPath2.print();
+				if (Math.random() < 0.5) {
+					System.out.println("Trying generatin sidePath at: ");
+					nextPath1.print();
+					boolean tooShort=generateSidePath(nextPath1);
+					if(!tooShort) {
+						generateSidePath(nextPath2);
+					}
 
-		} else {
-			System.out.println("Trying generatin sidePath at: ");
-			nextPath1.print();
-			generateSidePath(nextPath2);
+				} else {
+					System.out.println("Trying generatin sidePath at: ");
+					nextPath1.print();
+					boolean tooShort=generateSidePath(nextPath2);
+					if(!tooShort) {
+						generateSidePath(nextPath1);
+					}
+				}
+			}
 		}
 	}
 
@@ -218,7 +248,7 @@ public class MazeTest {
 		return false;
 	}
 
-	public void generateSidePath(Coordinate c) {
+	private boolean generateSidePath(Coordinate c) {
 		Coordinate current = c;
 		Coordinate last = null;
 		int current_x = c.getX();
@@ -228,20 +258,19 @@ public class MazeTest {
 
 		for (int i = 0; i < lenght; i++) {
 			if (Math.random() < 0.4) {
-				if (Math.random() < 0.5 && validateCoorS(current_x + 1, current_y)) {
-					// System.out.println("x + 1");
+				if (Math.random() < 0.5 && !current.equals(new Coordinate(current_x + 1, current_y))
+						&& validateCoorS(current_x + 1, current_y)) {
 					current_x++;
-
-				} else if (validateCoorS(current_x - 1, current_y)) {
-					// System.out.println("x - 1");
+				} else if (!current.equals(new Coordinate(current_x - 1, current_y))
+						&& validateCoorS(current_x - 1, current_y)) {
 					current_x--;
 				}
 			} else {
-				if (Math.random() < 0.6 && validateCoorS(current_x, current_y + 1)) {
-					// System.out.println("y + 1");
+				if (Math.random() < 0.6 && !current.equals(new Coordinate(current_x, current_y + 1))
+						&& validateCoorS(current_x, current_y + 1)) {
 					current_y++;
-				} else if (validateCoorS(current_x, current_y - 1)) {
-					// System.out.println("y - 1");
+				} else if (!current.equals(new Coordinate(current_x, current_y - 1))
+						&& validateCoorS(current_x, current_y - 1)) {
 					current_y--;
 				}
 			}
@@ -252,11 +281,21 @@ public class MazeTest {
 				current = new Coordinate(current_x, current_y);
 				if (matrix[current.getY()][current.getX()] == 2) {
 					System.out.println("Hit another sidepath");
-					return;
+					System.out.println("length of the path:" + steps);
+					if (steps == 0) {
+						System.out.println("Path too short!");
+						return false;
+					}
+					return true;
 				}
-
 			}
 		}
+		System.out.println("length of the path:" + steps);
+		if (steps == 0) {
+			System.out.println("Path too short!");
+			return false;
+		}
+		return true;
 	}
 
 	public static void main(String[] args) {
