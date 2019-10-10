@@ -65,19 +65,24 @@ public class MazeGenerator extends MapeItem{
 		LogHelper.info("Generating maze matrix...");
 		if (mazeGenerator == null)
 			mazeGenerator = new MazeTest(10, 10, 80, 20);
+		if (mazeGenerator.matrixIsEmpty()) {
+			mazeGenerator.generateMaze();
+			double[] spawnPoint = {pos.getX(), pos.getY(), pos.getZ()};
+			mazeSpawnPoint = spawnPoint;
+		}
 		LogHelper.info("Matrix generated");
 		
-		buildLabyrinth(mazeGenerator.getMatrix(), worldIn, pos);
-			
+		LogHelper.info("Building maze...");
+		buildLabyrinth(mazeGenerator.getMatrix(), worldIn, pos);	
 		LogHelper.info("Maze built");
+		
 		// teleport the player to the start point of the maze
 		if (currentStartPoint != null) {
 				
-			LogHelper.info("Teleporting player to start point...");
 			double px = currentStartPoint[0] + 0.5;
 			double py = currentStartPoint[1] + 1;
 			double pz = currentStartPoint[2] + 0.5;
-			
+			LogHelper.info("Teleporting player to " + px + " " + py + " " + pz);
 			MinecraftServer s = FMLCommonHandler.instance().getMinecraftServerInstance();
 			s.getCommandManager().executeCommand( s, "/tp " + player.getName() + " " + px + " " + py + " " + pz );
 			LogHelper.info("Player teleported");
@@ -142,26 +147,29 @@ public class MazeGenerator extends MapeItem{
 		double px = mazeSpawnPoint[0];
 		double py = mazeSpawnPoint[1];
 		double pz = mazeSpawnPoint[2];
+		LogHelper.info("Found maze spawn point at: " + px + " " + py + " " + pz);
 		
 		LogHelper.info("Clearing maze...");
 		for (int i = 0; i < bluePrint.length; i++) {
 			for (int j = 0; j < bluePrint[0].length; j++) {
 				
 				// clear the walls
-				worldIn.setBlockState(new BlockPos(px + j, py + 1, pz + i), Blocks.AIR.getDefaultState());
-				worldIn.setBlockState(new BlockPos(px + j, py + 2, pz + i), Blocks.AIR.getDefaultState());
-				worldIn.setBlockState(new BlockPos(px + j, py + 3, pz + i), Blocks.AIR.getDefaultState());
-				worldIn.setBlockState(new BlockPos(px + j, py + 4, pz + i), Blocks.AIR.getDefaultState());
+				worldIn.setBlockToAir(new BlockPos(px + j, py + 1, pz + i));
+				worldIn.setBlockToAir(new BlockPos(px + j, py + 2, pz + i));
+				worldIn.setBlockToAir(new BlockPos(px + j, py + 3, pz + i));
+				worldIn.setBlockToAir(new BlockPos(px + j, py + 4, pz + i));
 				
 				// clear the floor
 				worldIn.setBlockState(new BlockPos(px + j, py - 1, pz + i), Blocks.DIRT.getDefaultState());
 				worldIn.setBlockState(new BlockPos(px + j, py, pz + i), Blocks.DIRT.getDefaultState());
 				
 				// clear old start point
-				worldIn.setBlockState(new BlockPos(currentStartPoint[0], currentStartPoint[1] + 1, currentStartPoint[2]), Blocks.AIR.getDefaultState());
+				worldIn.setBlockToAir(new BlockPos(currentStartPoint[0], currentStartPoint[1] + 1, currentStartPoint[2]));
 				
 			}
 		}
+		LogHelper.info("Updating Render from :" + px + " " + py + " " + pz + " to " + (px + bluePrint[0].length) + " " +  (py + 4) + " " + (pz + bluePrint.length));
+		worldIn.markBlockRangeForRenderUpdate(new BlockPos(px, py, pz), new BlockPos(px + bluePrint[0].length, py + 4, pz + bluePrint.length));
 		LogHelper.info("Maze cleared");
 		
 	}
