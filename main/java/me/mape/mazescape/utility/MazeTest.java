@@ -128,6 +128,24 @@ public class MazeTest {
 		}
 		return result;
 	}
+	private Coordinate lastMain(Coordinate c) {
+		int x = c.getX();
+		int y = c.getY();
+		Coordinate result = null;
+		if (matrix[y + 1][x] == 5) {
+			result = new Coordinate(x, y + 1);
+		}
+		if (matrix[y - 1][x] == 5) {
+			result = new Coordinate(x, y - 1);
+		}
+		if (matrix[y][x + 1] == 5) {
+			result = new Coordinate(x + 1, y);
+		}
+		if (matrix[y][x - 1] == 5) {
+			result = new Coordinate(x - 1, y);
+		}
+		return result;
+	}
 
 	public void generateSidePaths() {
 		int begin = (int) (Math.random() * 6) + 1;
@@ -164,7 +182,7 @@ public class MazeTest {
 	
 	public boolean validateCoorS(int x,int y) {
 		if (x < max_x - 1 && y < max_y - 1 && x > 0 && y > 0 && (matrix[y][x] == 0||matrix[y][x]==2)) {
-			if (nextMain(new Coordinate(x,y))!=null)
+			if (nextMain(new Coordinate(x,y))!=null||lastMain(new Coordinate(x,y))!=null)
 				return false;
 			else
 				return true;
@@ -211,11 +229,13 @@ public class MazeTest {
 		}
 	}
 
-//	public static void main(String[] args) {
-//		MazeTest m1 = new MazeTest(30, 30);
-//		// m1.printmatrix();
-//		m1.generateMainPath(300);
-//		System.out.println("---------------------------------------------------");
-//		m1.printmatrix();
-//	}
+	public static void main(String[] args) {
+		MazeTest m1 = new MazeTest(30, 30,300,20);
+		// m1.printmatrix();
+		System.out.println("---------------------------------------------------");
+		m1.printmatrix();
+		System.out.println("---------------------------------------------------");
+		m1.generateSidePaths();
+		m1.printmatrix();
+	}
 }
