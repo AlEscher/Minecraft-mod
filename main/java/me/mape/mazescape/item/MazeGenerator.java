@@ -75,9 +75,11 @@ public class MazeGenerator extends MapeItem{
 					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY() + 1, pos.getZ() + i), Blocks.BEDROCK.getDefaultState());
 					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY() + 2, pos.getZ() + i), Blocks.BEDROCK.getDefaultState());
 					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY() + 3, pos.getZ() + i), Blocks.BEDROCK.getDefaultState());
-					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY() + 1, pos.getZ() + i), Blocks.BEDROCK.getDefaultState());
+					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY() + 4, pos.getZ() + i), Blocks.BEDROCK.getDefaultState());
 					break;
 				case 1:
+					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY(), pos.getZ() + i), Blocks.GLOWSTONE.getDefaultState());
+					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY() + 4, pos.getZ() + i), Blocks.BEDROCK.getDefaultState());
 					break;
 				case 4:
 					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY() + 1, pos.getZ() + i), Blocks.CARPET.getDefaultState());
