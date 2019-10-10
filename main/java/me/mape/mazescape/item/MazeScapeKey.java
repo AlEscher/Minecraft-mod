@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import me.mape.mazescape.init.ModItems;
 import me.mape.mazescape.reference.Reference;
 import me.mape.mazescape.utility.MazeTest;
 import net.minecraft.block.Block;
@@ -65,6 +66,7 @@ public class MazeScapeKey extends MapeItem{
 			if (worldIn.isRemote) {
 				showMessage("Congratulations, you solved the maze!\nProgressing to stage " + ++currentStage);
 			}
+			ModItems.mazegen.clearLabyrinth();
 		}
 		
 		return EnumActionResult.PASS;

@@ -4,6 +4,8 @@ import org.apache.logging.log4j.Level;
 
 import me.mape.mazescape.reference.Reference;
 import net.minecraftforge.fml.common.FMLLog;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class LogHelper {
 	

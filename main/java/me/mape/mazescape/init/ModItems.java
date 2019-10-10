@@ -15,14 +15,13 @@ import me.mape.mazescape.reference.Reference;
 @Mod.EventBusSubscriber(modid=Reference.MOD_ID)
 public class ModItems {
 	
-	public static MapeItem mazekey;
-	public static MapeItem mazegen;
+	public static MazeScapeKey mazekey;
+	public static MazeGenerator mazegen;
 	
 	public static void init() {
 		
 		mazekey = new MazeScapeKey();
 		mazegen = new MazeGenerator();
-		//ForgeRegistries.ITEMS.register(mazekey);
 		
 	}
 	

@@ -28,7 +28,9 @@ public class MazeGenerator extends MapeItem{
 	
 	private MazeTest mazeGenerator;
 	private EntityPlayer currentPlayer;
+	private World currentWorld;
 	private double[] currentStartPoint;
+	private double[] mazeSpawnPoint;
 	
 	public MazeGenerator() {
 		super();
@@ -59,25 +61,26 @@ public class MazeGenerator extends MapeItem{
     public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
     {
 		currentPlayer = player;
+		currentWorld = worldIn;
 		LogHelper.info("Generating maze matrix...");
-		mazeGenerator = new MazeTest(10, 10, 80, 20);
+		if (mazeGenerator == null)
+			mazeGenerator = new MazeTest(10, 10, 80, 20);
 		LogHelper.info("Matrix generated");
 		
-		if (mazeGenerator != null) {
-			LogHelper.info("Building maze...");
-			buildLabyrinth(mazeGenerator.getMatrix(), worldIn, pos);
-			LogHelper.info("Maze built");
-			if (currentStartPoint != null) {
-				
-				LogHelper.info("Teleporting player to start point...");
-				double px = currentStartPoint[0] + 0.5;
-				double py = currentStartPoint[1] + 1;
-				double pz = currentStartPoint[2] + 0.5;
+		buildLabyrinth(mazeGenerator.getMatrix(), worldIn, pos);
 			
-				MinecraftServer s = FMLCommonHandler.instance().getMinecraftServerInstance();
-				s.getCommandManager().executeCommand( s, "/tp " + player.getName() + " " + px + " " + py + " " + pz );
-				LogHelper.info("Player teleported");
-			}
+		LogHelper.info("Maze built");
+		// teleport the player to the start point of the maze
+		if (currentStartPoint != null) {
+				
+			LogHelper.info("Teleporting player to start point...");
+			double px = currentStartPoint[0] + 0.5;
+			double py = currentStartPoint[1] + 1;
+			double pz = currentStartPoint[2] + 0.5;
+			
+			MinecraftServer s = FMLCommonHandler.instance().getMinecraftServerInstance();
+			s.getCommandManager().executeCommand( s, "/tp " + player.getName() + " " + px + " " + py + " " + pz );
+			LogHelper.info("Player teleported");
 		}
 		
 		return EnumActionResult.PASS;
@@ -96,7 +99,8 @@ public class MazeGenerator extends MapeItem{
 					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY() + 4, pos.getZ() + i), Blocks.BEDROCK.getDefaultState());
 					break;
 				case 1:
-					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY(), pos.getZ() + i), Blocks.GLOWSTONE.getDefaultState());
+					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY(), pos.getZ() + i), Blocks.GLASS.getDefaultState());
+					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY() - 1, pos.getZ() + i), Blocks.GLOWSTONE.getDefaultState());
 					//worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY() + 4, pos.getZ() + i), Blocks.BEDROCK.getDefaultState());
 					break;
 				case 4:
@@ -107,6 +111,9 @@ public class MazeGenerator extends MapeItem{
 					break;
 				case 3:
 					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY(), pos.getZ() + i), Blocks.DIAMOND_BLOCK.getDefaultState());
+					break;
+				default:
+					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY() + 1, pos.getZ() + i), Blocks.STONE.getDefaultState());
 					break;
 					
 				}
@@ -119,6 +126,44 @@ public class MazeGenerator extends MapeItem{
 		if (worldIn.isRemote) {
 			showMessage("Loaded 100% of maze!");
 		}
+	}
+	
+	public void clearLabyrinth() {
+		clearLabyrinth(mazeGenerator.getMatrix(), currentWorld);
+	}
+	
+	/**
+	 * clear the maze after the player has solved it
+	 * @param bluePrint
+	 * @param worldIn
+	 */
+	private void clearLabyrinth(int[][] bluePrint, World worldIn) {
+		
+		double px = mazeSpawnPoint[0];
+		double py = mazeSpawnPoint[1];
+		double pz = mazeSpawnPoint[2];
+		
+		LogHelper.info("Clearing maze...");
+		for (int i = 0; i < bluePrint.length; i++) {
+			for (int j = 0; j < bluePrint[0].length; j++) {
+				
+				// clear the walls
+				worldIn.setBlockState(new BlockPos(px + j, py + 1, pz + i), Blocks.AIR.getDefaultState());
+				worldIn.setBlockState(new BlockPos(px + j, py + 2, pz + i), Blocks.AIR.getDefaultState());
+				worldIn.setBlockState(new BlockPos(px + j, py + 3, pz + i), Blocks.AIR.getDefaultState());
+				worldIn.setBlockState(new BlockPos(px + j, py + 4, pz + i), Blocks.AIR.getDefaultState());
+				
+				// clear the floor
+				worldIn.setBlockState(new BlockPos(px + j, py - 1, pz + i), Blocks.DIRT.getDefaultState());
+				worldIn.setBlockState(new BlockPos(px + j, py, pz + i), Blocks.DIRT.getDefaultState());
+				
+				// clear old start point
+				worldIn.setBlockState(new BlockPos(currentStartPoint[0], currentStartPoint[1] + 1, currentStartPoint[2]), Blocks.AIR.getDefaultState());
+				
+			}
+		}
+		LogHelper.info("Maze cleared");
+		
 	}
 
 }
