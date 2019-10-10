@@ -71,7 +71,6 @@ public class MazeTest {
 		int current_y = 1;
 		Coordinate current = new Coordinate(current_x, current_y);
 		startcoor = current;
-		current.print();
 		Coordinate last = null;
 		for (int i = 0; i < lenght; i++) {
 			if (Math.random() < 0.4) {
@@ -133,26 +132,14 @@ public class MazeTest {
 	public void generateSidePaths() {
 		int begin = (int) (Math.random() * 6) + 1;
 		Coordinate recent = startcoor;
-		Coordinate nextPath;
+		Coordinate nextPath1;
+		Coordinate nextPath2;
 		for (; begin > 0; begin--) {
 			recent = nextMain(recent);
 			matrix[recent.getY()][recent.getX()] = 5;
 		}
-		if (Math.random() < 0.5) {
-			if (Math.random() < 0.5 && matrix[recent.getY() + 1][recent.getX()] == 0) {
-				nextPath = new Coordinate(recent.getY() + 1, recent.getX());
-			} else {
-				nextPath = new Coordinate(recent.getY(), recent.getX() + 1);
-
-			}
-		} else {
-			if (Math.random() < 0.5 && matrix[recent.getY() - 1][recent.getX()] == 0) {
-				nextPath = new Coordinate(recent.getY() - 1, recent.getX());
-			} else {
-				nextPath = new Coordinate(recent.getY(), recent.getX() - 1);
-
-			}
-		}
+		if(matrix[recent.getY()+1][recent.getX()] == 5);
+		
 	}
 
 //	public static void main(String[] args) {
