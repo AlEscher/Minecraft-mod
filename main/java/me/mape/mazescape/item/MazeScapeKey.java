@@ -67,6 +67,7 @@ public class MazeScapeKey extends MapeItem{
 				showMessage("Congratulations, you solved the maze!\nProgressing to stage " + ++currentStage);
 			}
 			ModItems.mazegen.clearLabyrinth();
+			ModItems.mazegen.getMazeGenerator().emptyMatrix();
 		}
 		
 		return EnumActionResult.PASS;

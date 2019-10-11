@@ -37,7 +37,7 @@ public class MazeGenerator extends MapeItem{
 	private int y = 20;
 	private int length = 160;
 	private int minLength = 50;
-	private boolean hasChanged = false;
+	private boolean hasChangedValues = false;
 	
 	public MazeGenerator() {
 		super();
@@ -53,11 +53,13 @@ public class MazeGenerator extends MapeItem{
 	}
 	
 	public void updateMazeValues(int x, int y, int length, int minLength) {
+		LogHelper.info("Updating maze values");
 		this.x = x;
 		this.y = y;
 		this.length = length;
 		this.minLength = minLength;
-		this.hasChanged = true;
+		this.hasChangedValues = true;
+		mazeGenerator = new MazeTest(x, y, length, minLength);
 	}
 	
 	/**
@@ -78,7 +80,7 @@ public class MazeGenerator extends MapeItem{
 		currentPlayer = player;
 		currentWorld = worldIn;
 		
-		if (!hasChanged && worldIn.isRemote)
+		if (!hasChangedValues && worldIn.isRemote)
 			showMessage("Using default values, type /setupmaze to customize the maze");
 		
 		LogHelper.info("Generating maze matrix...");
@@ -143,7 +145,8 @@ public class MazeGenerator extends MapeItem{
 				}
 			}
 			double progress = (double)i / (double)bluePrint.length;
-			if (worldIn.isRemote && i > 0) {
+			// show progress for the player in 10% steps
+			if (worldIn.isRemote && i > 0 && i % (bluePrint.length / 10)  == 0) {
 				showMessage("Loaded " + progress * 100 + "% of maze!");
 			}
 		}
@@ -191,6 +194,10 @@ public class MazeGenerator extends MapeItem{
 		worldIn.markBlockRangeForRenderUpdate(new BlockPos(px, py, pz), new BlockPos(px + bluePrint[0].length, py + 4, pz + bluePrint.length));
 		LogHelper.info("Maze cleared");
 		
+	}
+	
+	public MazeTest getMazeGenerator() {
+		return mazeGenerator;
 	}
 
 }
