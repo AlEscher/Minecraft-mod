@@ -6,6 +6,7 @@ import javax.annotation.Nullable;
 
 import me.mape.mazescape.init.ModItems;
 import me.mape.mazescape.reference.Reference;
+import me.mape.mazescape.utility.LogHelper;
 import me.mape.mazescape.utility.MazeTest;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -23,8 +24,9 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import scala.concurrent.Lock;
 
-/*
+/**
  * The key that is needed in game to complete a stage
  */
 public class MazeScapeKey extends MapeItem{
@@ -61,17 +63,37 @@ public class MazeScapeKey extends MapeItem{
     public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
     {
 		currentPlayer = player;
-		Block selectedBlock = worldIn.getBlockState(pos).getBlock();
-		if (Block.getStateId(selectedBlock.getDefaultState()) == Block.getStateId(Blocks.DIAMOND_BLOCK.getDefaultState())) {
+		if (worldIn.getBlockState(pos).equals(Blocks.DIAMOND_BLOCK.getDefaultState())) {
 			if (worldIn.isRemote) {
-				showMessage("Congratulations, you solved the maze!\nProgressing to stage " + ++currentStage);
+				showMessage("Congratulations, you solved the maze!\nProgressing to stage " + (++currentStage + 1));
+				// Client waits for the server to finish clearing the maze
+//				synchronized(ModItems.mazegen.getMazeGenerator()) {
+//					try {
+//						ModItems.mazegen.getMazeGenerator().wait();
+//					} catch (InterruptedException e) {
+//						e.printStackTrace();
+//					}
+//				}
 			}
-			ModItems.mazegen.clearLabyrinth();
-			ModItems.mazegen.getMazeGenerator().emptyMatrix();
+			//ModItems.mazegen.clearLabyrinth();
+			if (worldIn.isRemote) { 
+				LogHelper.info("Resetting maze");
+				ModItems.mazegen.getMazeGenerator().emptyMatrix();
+				showMessage("Progressing to stage " + currentStage);
+			}
+			LogHelper.info("Generating stage " + currentStage);
+			ModItems.mazegen.initMaze(player, worldIn, ModItems.mazegen.getSpawnPos(), currentStage, false);
+			// Server thread notifies the client that he has finished clearing the maze
+//			synchronized(ModItems.mazegen.getMazeGenerator()) {
+//				ModItems.mazegen.getMazeGenerator().notify();
+//			}
 		}
-		
-		return EnumActionResult.PASS;
+		return EnumActionResult.SUCCESS;
     }
+	
+	public void setCurrentStage(int newStage) {
+		this.currentStage = newStage;
+	}
 	
 	
 

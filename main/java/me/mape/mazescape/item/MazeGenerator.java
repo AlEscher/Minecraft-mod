@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import me.mape.mazescape.init.ModItems;
 import me.mape.mazescape.reference.Reference;
 import me.mape.mazescape.utility.LogHelper;
 import me.mape.mazescape.utility.MazeTest;
@@ -20,6 +21,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -29,6 +31,7 @@ public class MazeGenerator extends MapeItem{
 	private MazeTest mazeGenerator;
 	private EntityPlayer currentPlayer;
 	private World currentWorld;
+	private BlockPos spawnPos;
 	private double[] currentStartPoint;
 	private double[] mazeSpawnPoint;
 	
@@ -79,22 +82,58 @@ public class MazeGenerator extends MapeItem{
     {
 		currentPlayer = player;
 		currentWorld = worldIn;
+		spawnPos = pos;
+		ModItems.mazekey.setCurrentStage(0);
+		initMaze(player, worldIn, pos, 0, true);
+		
+		return EnumActionResult.SUCCESS;
+    }
+	
+	/**
+	 * Generates a maze if one is not already generated, also calls buildLabyrinth
+	 * @param player
+	 * @param worldIn
+	 * @param pos
+	 * @param stage
+	 * @param createdByPlayer
+	 */
+	public void initMaze(EntityPlayer player, World worldIn, BlockPos pos, int stage, boolean createdByPlayer) {
+		
+		if (pos == null) {
+			showMessage("Use the MazeGenerator first");
+			return;
+		}
 		
 		if (!hasChangedValues && worldIn.isRemote)
 			showMessage("Using default values, type /setupmaze to customize the maze");
 		
-		LogHelper.info("Generating maze matrix...");
 		if (mazeGenerator == null)
 			mazeGenerator = new MazeTest(x, y, length, minLength);
-		if (mazeGenerator.matrixIsEmpty()) {
-			mazeGenerator.generateMaze();
-			double[] spawnPoint = {pos.getX(), pos.getY(), pos.getZ()};
-			mazeSpawnPoint = spawnPoint;
+		
+		// Client generates a new maze if the current one is empty
+		if (mazeGenerator.matrixIsEmpty() && worldIn.isRemote) {
+			synchronized(mazeGenerator) {
+				LogHelper.info("Generating maze matrix...");
+				mazeGenerator.generateMaze();
+				LogHelper.info("Matrix generated");
+				// set the maze spawn point only if the maze was created by the player using the MazeGen item
+				if (createdByPlayer) {
+					double[] spawnPoint = {pos.getX(), pos.getY(), pos.getZ()};
+					mazeSpawnPoint = spawnPoint;
+				}
+
+			}
 		}
-		LogHelper.info("Matrix generated");
+		
+		// The server waits until the client finishes generating the maze
+		if (!worldIn.isRemote) {
+			synchronized(mazeGenerator) {
+				LogHelper.info("Hello");
+			}
+		}
 		
 		LogHelper.info("Building maze...");
-		buildLabyrinth(mazeGenerator.getMatrix(), worldIn, pos);	
+		buildLabyrinth(mazeGenerator.getMatrix(), worldIn, pos, stage);	
 		LogHelper.info("Maze built");
 		
 		// teleport the player to the start point of the maze
@@ -103,55 +142,49 @@ public class MazeGenerator extends MapeItem{
 			double px = currentStartPoint[0] + 0.5;
 			double py = currentStartPoint[1] + 1;
 			double pz = currentStartPoint[2] + 0.5;
-			LogHelper.info("Teleporting player to " + px + " " + py + " " + pz);
-			MinecraftServer s = FMLCommonHandler.instance().getMinecraftServerInstance();
-			s.getCommandManager().executeCommand( s, "/tp " + player.getName() + " " + px + " " + py + " " + pz );
-			LogHelper.info("Player teleported");
+			if (!worldIn.isRemote) { 
+				LogHelper.info("Teleporting player to " + px + " " + py + " " + pz);
+				MinecraftServer s = FMLCommonHandler.instance().getMinecraftServerInstance();
+				s.getCommandManager().executeCommand( s, "/tp " + player.getName() + " " + px + " " + py + " " + pz );
+				LogHelper.info("Player teleported");
+			}
 		}
 		
-		return EnumActionResult.PASS;
-    }
+	}
 	
-	private void buildLabyrinth(int[][] bluePrint, World worldIn, BlockPos pos) {
+	public void buildLabyrinth(int[][] bluePrint, World worldIn, BlockPos pos, int stage) {
 		for (int i = 0; i < bluePrint.length; i++) {
 			for (int j = 0; j < bluePrint[0].length; j++) {
 				
 				switch(bluePrint[i][j]) {
 				
 				case 0:
-					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY() + 1, pos.getZ() + i), Blocks.BEDROCK.getDefaultState());
-					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY() + 2, pos.getZ() + i), Blocks.BEDROCK.getDefaultState());
-					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY() + 3, pos.getZ() + i), Blocks.BEDROCK.getDefaultState());
-					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY() + 4, pos.getZ() + i), Blocks.BEDROCK.getDefaultState());
-					break;
-				case 1:
-					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY(), pos.getZ() + i), Blocks.GLASS.getDefaultState());
-					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY() - 1, pos.getZ() + i), Blocks.GLOWSTONE.getDefaultState());
-					//worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY() + 4, pos.getZ() + i), Blocks.BEDROCK.getDefaultState());
+					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY() + 1 + 6 * stage, pos.getZ() + i), Blocks.BEDROCK.getDefaultState());
+					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY() + 2 + 6 * stage, pos.getZ() + i), Blocks.BEDROCK.getDefaultState());
+					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY() + 3 + 6 * stage, pos.getZ() + i), Blocks.BEDROCK.getDefaultState());
+					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY() + 4 + 6 * stage, pos.getZ() + i), Blocks.BEDROCK.getDefaultState());
 					break;
 				case 4:
-					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY() + 1, pos.getZ() + i), Blocks.CARPET.getDefaultState());
-					double[] startPoint = {pos.getX() + j, pos.getY(), pos.getZ() + i};
+					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY() + 1 + 6 * stage, pos.getZ() + i), Blocks.CARPET.getDefaultState());
+					double[] startPoint = {pos.getX() + j, pos.getY() + 6 * stage, pos.getZ() + i};
 					LogHelper.info("Found start point at: " + startPoint[0] + " " + startPoint[1] + " " + startPoint[2]);
 					currentStartPoint = startPoint;
 					break;
 				case 3:
-					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY(), pos.getZ() + i), Blocks.DIAMOND_BLOCK.getDefaultState());
+					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY() + 6 * stage, pos.getZ() + i), Blocks.DIAMOND_BLOCK.getDefaultState());
+					break;
+				case 2:
+				case 1:
+					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY() + 6 * stage, pos.getZ() + i), Blocks.GLASS.getDefaultState());
+					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY() - 1 + 6 * stage, pos.getZ() + i), Blocks.GLOWSTONE.getDefaultState());
+					//worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY() + 4 + 6 * stage, pos.getZ() + i), Blocks.BEDROCK.getDefaultState());
 					break;
 				default:
-					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY() + 1, pos.getZ() + i), Blocks.STONE.getDefaultState());
+					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY() + 1 + 6 * stage, pos.getZ() + i), Blocks.STONE.getDefaultState());
 					break;
 					
 				}
 			}
-			double progress = (double)i / (double)bluePrint.length;
-			// show progress for the player in 10% steps
-			if (worldIn.isRemote && i > 0 && i % (bluePrint.length / 10)  == 0) {
-				showMessage("Loaded " + progress * 100 + "% of maze!");
-			}
-		}
-		if (worldIn.isRemote) {
-			showMessage("Loaded 100% of maze!");
 		}
 	}
 	
@@ -177,6 +210,7 @@ public class MazeGenerator extends MapeItem{
 				
 				// clear the walls
 				worldIn.setBlockToAir(new BlockPos(px + j, py + 1, pz + i));
+				//FMLClientHandler.instance().getServer().getWorld(0).destroyBlock(new BlockPos(px + j, py + 1, pz + i), false);
 				worldIn.setBlockToAir(new BlockPos(px + j, py + 2, pz + i));
 				worldIn.setBlockToAir(new BlockPos(px + j, py + 3, pz + i));
 				worldIn.setBlockToAir(new BlockPos(px + j, py + 4, pz + i));
@@ -190,14 +224,16 @@ public class MazeGenerator extends MapeItem{
 				
 			}
 		}
-		LogHelper.info("Updating Render from :" + px + " " + py + " " + pz + " to " + (px + bluePrint[0].length) + " " +  (py + 4) + " " + (pz + bluePrint.length));
-		worldIn.markBlockRangeForRenderUpdate(new BlockPos(px, py, pz), new BlockPos(px + bluePrint[0].length, py + 4, pz + bluePrint.length));
 		LogHelper.info("Maze cleared");
 		
 	}
 	
 	public MazeTest getMazeGenerator() {
 		return mazeGenerator;
+	}
+	
+	public BlockPos getSpawnPos() {
+		return spawnPos;
 	}
 
 }

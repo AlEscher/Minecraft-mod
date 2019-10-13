@@ -34,6 +34,7 @@ public class MazeScapeCommand extends CommandBase{
 	    		int length = Integer.parseInt(args[2]);
 	    		int minLength = Integer.parseInt(args[3]);
 	    		ModItems.mazegen.updateMazeValues(x, y, length, minLength);
+	    		LogHelper.info("Updated values to " + x + " " + y + " " + " " + length + " " + minLength);
 	    	} else {
 	    		LogHelper.warn("None / not enough arguments passed");
 	    		sender.sendMessage(new TextComponentString("Usage: /setupmaze <x> <y> <length> <minLength>"));
