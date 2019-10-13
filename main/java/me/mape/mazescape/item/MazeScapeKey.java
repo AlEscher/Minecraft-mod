@@ -88,7 +88,7 @@ public class MazeScapeKey extends MapeItem{
 //				ModItems.mazegen.getMazeGenerator().notify();
 //			}
 		}
-		return EnumActionResult.SUCCESS;
+		return EnumActionResult.PASS;
     }
 	
 	public void setCurrentStage(int newStage) {

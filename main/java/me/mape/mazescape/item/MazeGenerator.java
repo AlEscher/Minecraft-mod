@@ -86,7 +86,7 @@ public class MazeGenerator extends MapeItem{
 		ModItems.mazekey.setCurrentStage(0);
 		initMaze(player, worldIn, pos, 0, true);
 		
-		return EnumActionResult.SUCCESS;
+		return EnumActionResult.PASS;
     }
 	
 	/**
@@ -159,6 +159,7 @@ public class MazeGenerator extends MapeItem{
 				switch(bluePrint[i][j]) {
 				
 				case 0:
+					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY() + 6 * stage, pos.getZ() + i), Blocks.BEDROCK.getDefaultState());
 					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY() + 1 + 6 * stage, pos.getZ() + i), Blocks.BEDROCK.getDefaultState());
 					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY() + 2 + 6 * stage, pos.getZ() + i), Blocks.BEDROCK.getDefaultState());
 					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY() + 3 + 6 * stage, pos.getZ() + i), Blocks.BEDROCK.getDefaultState());
@@ -174,6 +175,9 @@ public class MazeGenerator extends MapeItem{
 					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY() + 6 * stage, pos.getZ() + i), Blocks.DIAMOND_BLOCK.getDefaultState());
 					break;
 				case 2:
+					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY() + 6 * stage, pos.getZ() + i), Blocks.GLASS.getDefaultState());
+					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY() - 1 + 6 * stage, pos.getZ() + i), Blocks.STONE.getDefaultState());
+					break;
 				case 1:
 					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY() + 6 * stage, pos.getZ() + i), Blocks.GLASS.getDefaultState());
 					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY() - 1 + 6 * stage, pos.getZ() + i), Blocks.GLOWSTONE.getDefaultState());
