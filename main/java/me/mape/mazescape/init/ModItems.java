@@ -1,6 +1,6 @@
 package me.mape.mazescape.init;
 
-import me.mape.mazescape.item.MapeItem;
+import me.mape.mazescape.item.BuildAWall;
 import me.mape.mazescape.item.MazeGenerator;
 import me.mape.mazescape.item.MazeScapeKey;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -17,23 +17,26 @@ public class ModItems {
 	
 	public static MazeScapeKey mazekey;
 	public static MazeGenerator mazegen;
+	public static BuildAWall buildawall;
 	
 	public static void init() {
 		
 		mazekey = new MazeScapeKey();
 		mazegen = new MazeGenerator();
+		buildawall = new BuildAWall();
 		
 	}
 	
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<Item> event) {
-		event.getRegistry().registerAll(mazekey, mazegen);
+		event.getRegistry().registerAll(mazekey, mazegen, buildawall);
 	}
 	
 	@SubscribeEvent
 	public static void registerRenders(ModelRegistryEvent event) {
 		registerRender(mazekey);
 		registerRender(mazegen);
+		registerRender(buildawall);
 	}
 	
 	private static void registerRender(Item item) {

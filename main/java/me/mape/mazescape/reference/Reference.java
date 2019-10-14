@@ -39,4 +39,19 @@ public class Reference {
 		}
 	}
 	
+	public static enum BuildAWallEnum {
+		BUILDAWALL("buildawall");
+		
+		private String unlocalizedName;
+		private String registryName;
+		
+		BuildAWallEnum(String registryName) {
+			this.registryName = registryName;
+		}
+		
+		public String getRegistryName() {
+			return registryName;
+		}
+	}
+	
 }

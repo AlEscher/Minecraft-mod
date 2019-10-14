@@ -29,7 +29,7 @@ import scala.concurrent.Lock;
 /**
  * The key that is needed in game to complete a stage
  */
-public class MazeScapeKey extends MapeItem{
+public class MazeScapeKey extends Item{
 	
 	private EntityPlayer currentPlayer;
 	private int currentStage = 0;

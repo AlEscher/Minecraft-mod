@@ -13,6 +13,7 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumActionResult;
@@ -26,7 +27,7 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class MazeGenerator extends MapeItem{
+public class MazeGenerator extends Item{
 	
 	private MazeTest mazeGenerator;
 	private EntityPlayer currentPlayer;
@@ -147,6 +148,7 @@ public class MazeGenerator extends MapeItem{
 				MinecraftServer s = FMLCommonHandler.instance().getMinecraftServerInstance();
 				s.getCommandManager().executeCommand( s, "/tp " + player.getName() + " " + px + " " + py + " " + pz );
 				LogHelper.info("Player teleported");
+				s.getCommandManager().executeCommand(s, "/gamemode survival " + player.getName());
 			}
 		}
 		
