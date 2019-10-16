@@ -173,11 +173,11 @@ public class MazeTest {
 		return result;
 	}
 
-	public void generateSidePaths() {
+ 	public void generateSidePaths() {
 		int wayDone = 0;
 		Coordinate recent = startcoor;
 		while (true) {
-			int begin = (int) (Math.random() * 6) + 1;
+			int begin = (int) (Math.random() * 5) + 1;
 			Coordinate nextPath1 = null;
 			Coordinate nextPath2 = null;
 			wayDone = wayDone + begin;
@@ -210,28 +210,32 @@ public class MazeTest {
 					nextPath1 = new Coordinate(recent.getX() - 1, recent.getY());
 				nextPath2 = new Coordinate(recent.getX() - 1, recent.getY());
 			}
-			System.out.println("Possible SidePaths:");
-			nextPath1.print();
-			if (nextPath2 == null) {
-				System.out.println("Trying generatin sidePath at: ");
-				nextPath1.print();
-				generateSidePath(nextPath1);
-			} else {
-				nextPath2.print();
-				if (Math.random() < 0.5) {
-					System.out.println("Trying generatin sidePath at: ");
-					nextPath1.print();
-					boolean tooShort=generateSidePath(nextPath1);
-					if(!tooShort) {
-						generateSidePath(nextPath2);
-					}
+			if (nextPath1 == null) {
 
-				} else {
+			} else {
+				System.out.println("Possible SidePaths:");
+				nextPath1.print();
+				if (nextPath2 == null) {
 					System.out.println("Trying generatin sidePath at: ");
 					nextPath1.print();
-					boolean tooShort=generateSidePath(nextPath2);
-					if(!tooShort) {
-						generateSidePath(nextPath1);
+					generateSidePath(nextPath1);
+				} else {
+					nextPath2.print();
+					if (Math.random() < 0.5) {
+						System.out.println("Trying generatin sidePath at: ");
+						nextPath1.print();
+						boolean tooShort = generateSidePath(nextPath1);
+						if (!tooShort) {
+							generateSidePath(nextPath2);
+						}
+
+					} else {
+						System.out.println("Trying generatin sidePath at: ");
+						nextPath1.print();
+						boolean tooShort = generateSidePath(nextPath2);
+						if (!tooShort) {
+							generateSidePath(nextPath1);
+						}
 					}
 				}
 			}
@@ -240,10 +244,11 @@ public class MazeTest {
 
 	public boolean validateCoorS(int x, int y) {
 		if (x < max_x - 1 && y < max_y - 1 && x > 0 && y > 0 && (matrix[y][x] == 0 || matrix[y][x] == 2)) {
-			if (nextMain(new Coordinate(x, y)) != null || lastMain(new Coordinate(x, y)) != null)
-				return false;
-			else
+			if (nextMain(new Coordinate(x, y)) == null && lastMain(new Coordinate(x, y)) == null) {
 				return true;
+				}
+			else
+				return false;
 		}
 		return false;
 	}
@@ -258,19 +263,15 @@ public class MazeTest {
 
 		for (int i = 0; i < lenght; i++) {
 			if (Math.random() < 0.4) {
-				if (Math.random() < 0.5 && !current.equals(new Coordinate(current_x + 1, current_y))
-						&& validateCoorS(current_x + 1, current_y)) {
+				if (Math.random() < 0.5 && !current.equals(new Coordinate(current_x + 1, current_y)) && validateCoorS(current_x + 1, current_y)) {
 					current_x++;
-				} else if (!current.equals(new Coordinate(current_x - 1, current_y))
-						&& validateCoorS(current_x - 1, current_y)) {
+				} else if (!current.equals(new Coordinate(current_x - 1, current_y)) && validateCoorS(current_x - 1, current_y)) {
 					current_x--;
 				}
 			} else {
-				if (Math.random() < 0.6 && !current.equals(new Coordinate(current_x, current_y + 1))
-						&& validateCoorS(current_x, current_y + 1)) {
+				if (Math.random() < 0.6 && !current.equals(new Coordinate(current_x, current_y + 1)) && validateCoorS(current_x, current_y + 1)) {
 					current_y++;
-				} else if (!current.equals(new Coordinate(current_x, current_y - 1))
-						&& validateCoorS(current_x, current_y - 1)) {
+				} else if (!current.equals(new Coordinate(current_x, current_y - 1)) && validateCoorS(current_x, current_y - 1)) {
 					current_y--;
 				}
 			}
@@ -304,8 +305,6 @@ public class MazeTest {
 		// m1.printmatrix();
 		System.out.println("---------------------------------------------------");
 		m1.printmatrix();
-		System.out.println("---------------------------------------------------");
-		m1.generateSidePaths();
-		m1.printmatrix();
+		
 	}
 }
