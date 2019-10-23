@@ -16,12 +16,14 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import scala.concurrent.Lock;
@@ -32,6 +34,9 @@ import scala.concurrent.Lock;
 public class MazeScapeKey extends Item{
 	
 	private EntityPlayer currentPlayer;
+	/**
+	 * current stage (0 based)
+	 */
 	private int currentStage = 0;
 	
 	public MazeScapeKey() {
@@ -63,17 +68,9 @@ public class MazeScapeKey extends Item{
     public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
     {
 		currentPlayer = player;
-		if (worldIn.getBlockState(pos).equals(Blocks.DIAMOND_BLOCK.getDefaultState())) {
+		if (worldIn.getBlockState(pos) == Blocks.DIAMOND_BLOCK.getDefaultState()) {
 			if (worldIn.isRemote) {
 				showMessage("Congratulations, you solved the maze!\nProgressing to stage " + (++currentStage + 1));
-				// Client waits for the server to finish clearing the maze
-//				synchronized(ModItems.mazegen.getMazeGenerator()) {
-//					try {
-//						ModItems.mazegen.getMazeGenerator().wait();
-//					} catch (InterruptedException e) {
-//						e.printStackTrace();
-//					}
-//				}
 			}
 			//ModItems.mazegen.clearLabyrinth();
 			if (worldIn.isRemote) { 
@@ -83,10 +80,13 @@ public class MazeScapeKey extends Item{
 			}
 			LogHelper.info("Generating stage " + currentStage);
 			ModItems.mazegen.initMaze(player, worldIn, ModItems.mazegen.getSpawnPos(), currentStage, false);
-			// Server thread notifies the client that he has finished clearing the maze
-//			synchronized(ModItems.mazegen.getMazeGenerator()) {
-//				ModItems.mazegen.getMazeGenerator().notify();
-//			}
+		} else if (worldIn.getBlockState(pos) == Blocks.GLASS.getDefaultState()) {
+			
+			if (!worldIn.isRemote) {
+				MinecraftServer s = FMLCommonHandler.instance().getMinecraftServerInstance();
+				s.getCommandManager().executeCommand( s, "/give " + player.getName() + " potion 1 0 {Potion:\"minecraft:strong_swiftness\"}");
+			}
+			
 		}
 		return EnumActionResult.PASS;
     }

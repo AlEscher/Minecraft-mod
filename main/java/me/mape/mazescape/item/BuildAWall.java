@@ -33,7 +33,7 @@ public class BuildAWall extends Item{
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
-		tooltip.add("This item lets you spawn a temporary wall");
+		tooltip.add("This item lets you spawn a breakable wall");
 	}
 	
 	@Override

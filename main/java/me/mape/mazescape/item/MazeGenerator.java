@@ -13,8 +13,13 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
+import net.minecraft.init.MobEffects;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.potion.PotionType;
+import net.minecraft.potion.PotionUtils;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
@@ -87,6 +92,12 @@ public class MazeGenerator extends Item{
 		ModItems.mazekey.setCurrentStage(0);
 		initMaze(player, worldIn, pos, 0, true);
 		
+//		for (ItemStack stack : player.inventory.mainInventory) {
+//			if (stack.isEmpty()) {
+//				stack = PotionUtils.addPotionToItemStack(stack, PotionType.REGISTRY.getObjectById(1));
+//				break;
+//			}
+//		}	
 		return EnumActionResult.PASS;
     }
 	
