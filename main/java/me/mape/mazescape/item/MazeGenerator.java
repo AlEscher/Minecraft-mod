@@ -21,6 +21,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionType;
 import net.minecraft.potion.PotionUtils;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -31,6 +32,8 @@ import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
 
 public class MazeGenerator extends Item{
 	
@@ -178,6 +181,16 @@ public class MazeGenerator extends Item{
 					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY() + 3 + 6 * stage, pos.getZ() + i), Blocks.BEDROCK.getDefaultState());
 					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY() + 4 + 6 * stage, pos.getZ() + i), Blocks.BEDROCK.getDefaultState());
 					break;
+				case 5:
+					BlockPos chestPos = new BlockPos(pos.getX() + j, pos.getY() + 1 + 6 * stage, pos.getZ() + i);
+					worldIn.setBlockState(chestPos, Blocks.CHEST.getDefaultState());
+					TileEntity tile = worldIn.getTileEntity(chestPos);
+					IItemHandler handler = tile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EnumFacing.UP);
+					ItemStack wallBuilders = new ItemStack(ModItems.buildawall, 3);
+					handler.insertItem(0, wallBuilders, false);
+					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY() + 6 * stage, pos.getZ() + i), Blocks.GLASS.getDefaultState());
+					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY() - 1 + 6 * stage, pos.getZ() + i), Blocks.STONE.getDefaultState());
+					break;
 				case 4:
 					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY() + 1 + 6 * stage, pos.getZ() + i), Blocks.CARPET.getDefaultState());
 					double[] startPoint = {pos.getX() + j, pos.getY() + 6 * stage, pos.getZ() + i};
@@ -199,8 +212,8 @@ public class MazeGenerator extends Item{
 				default:
 					worldIn.setBlockState(new BlockPos(pos.getX() + j, pos.getY() + 1 + 6 * stage, pos.getZ() + i), Blocks.STONE.getDefaultState());
 					break;
-					
 				}
+					
 			}
 		}
 	}

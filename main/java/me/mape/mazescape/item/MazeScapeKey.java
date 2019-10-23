@@ -80,7 +80,7 @@ public class MazeScapeKey extends Item{
 			}
 			LogHelper.info("Generating stage " + currentStage);
 			ModItems.mazegen.initMaze(player, worldIn, ModItems.mazegen.getSpawnPos(), currentStage, false);
-		} else if (worldIn.getBlockState(pos) == Blocks.GLASS.getDefaultState()) {
+		} else if (worldIn.getBlockState(pos) == Blocks.CHEST.getDefaultState()) {
 			
 			if (!worldIn.isRemote) {
 				MinecraftServer s = FMLCommonHandler.instance().getMinecraftServerInstance();
